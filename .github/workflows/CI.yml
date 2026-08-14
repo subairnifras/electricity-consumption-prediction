@@ -2,9 +2,13 @@ name: Python CI and Vercel CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+
   pull_request:
-    branches: [main]
+    branches:
+      - main
+
   workflow_dispatch:
 
 concurrency:
@@ -15,6 +19,7 @@ jobs:
   test:
     name: Test Flask Application
     runs-on: ubuntu-latest
+
     defaults:
       run:
         working-directory: electricity-firefly-webapp
@@ -45,8 +50,10 @@ jobs:
 
           client = app.test_client()
           response = client.get("/")
+
           assert response.status_code == 200
           assert b"GridAI" in response.data
+
           print("Flask homepage test passed")
           PY
 
@@ -54,10 +61,13 @@ jobs:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
     needs: test
+
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+
     defaults:
       run:
         working-directory: electricity-firefly-webapp
+
     env:
       VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
@@ -74,15 +84,22 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
-      - name: Verify Vercel authentication
-        run: vercel whoami --token=${{ secrets.VERCEL_TOKEN }}
-
       - name: Pull Vercel configuration
-        run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+        run: >
+          vercel pull
+          --yes
+          --environment=production
+          --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Build application
-        run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+        run: >
+          vercel build
+          --prod
+          --token=${{ secrets.VERCEL_TOKEN }}
 
       - name: Deploy application
-        run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
-
+        run: >
+          vercel deploy
+          --prebuilt
+          --prod
+          --token=${{ secrets.VERCEL_TOKEN }}
