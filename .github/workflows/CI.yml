@@ -57,7 +57,7 @@ jobs:
           print("Flask homepage test passed")
           PY
 
-    deploy:
+  deploy:
     name: Deploy to Vercel
     runs-on: ubuntu-latest
     needs: test
@@ -95,17 +95,4 @@ jobs:
           vercel deploy
           --prod
           --yes
-          --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Build application
-        run: >
-          vercel build
-          --prod
-          --token=${{ secrets.VERCEL_TOKEN }}
-
-      - name: Deploy application
-        run: >
-          vercel deploy
-          --prebuilt
-          --prod
           --token=${{ secrets.VERCEL_TOKEN }}
